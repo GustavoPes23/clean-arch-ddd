@@ -1,3 +1,5 @@
+import Entity from "../../@shared/entity/entity.abstract";
+import NotificationError from "../../@shared/notification/notification.error";
 import Address from "../value-object/address";
 import CustomerInterface from "./customer.interface";
 
@@ -22,29 +24,38 @@ infra - mundo externo
  -- customer.ts(get, set)
 */
 
-export default class Customer implements CustomerInterface {
+export default class Customer extends Entity implements CustomerInterface {
     //id serve para identificar o Customer no sistema e não no banco
-    private _id: string;
     private _name: string;
     private _address?: Address;
     private _active: boolean = false;
     private _rewardPoints: number = 0;
 
     constructor(id: string, name: string) {
-        this._id = id;
+        super(id);
         this._name = name;
         this.validate(); //uma entidade por padrão sempre tem que se autovalidar -> não deve deixar para outra parte do sistema, por isso os getters e setters são vilões - trocar
-        //o nome semantantico de setter para outro como change
+        //o nome semantico de setter para outro como change
+
+        if (this.notification.hasErrors("customer")) {
+            throw new NotificationError(this.notification.getErrors());
+        }
     }
 
     //uma entidade por padrão sempre tem que se autovalidar -> não deve deixar para outra parte do sistema
     validate(): void {
         if (this._name.length === 0) {
-            throw new Error("Name is required");
+            this.notification.addError({
+                message: "Name is required",
+                context: "customer",
+            });
         }
 
-        if (this._id.length === 0) {
-            throw new Error("Id is required");
+        if (this.id.length === 0) {
+            this.notification.addError({
+                message: "Id is required",
+                context: "customer",
+            });
         }
     }
 
@@ -54,10 +65,6 @@ export default class Customer implements CustomerInterface {
 
     get rewardPoints(): number {
         return this._rewardPoints;
-    }
-
-    get id(): string {
-        return this._id;
     }
 
     get Address(): Address | undefined {
