@@ -1,5 +1,6 @@
 import Entity from "../../@shared/entity/entity.abstract";
 import NotificationError from "../../@shared/notification/notification.error";
+import CustomerValidatorFactory from "../factory/customer.validator.factory";
 import Address from "../value-object/address";
 import CustomerInterface from "./customer.interface";
 
@@ -44,19 +45,25 @@ export default class Customer extends Entity implements CustomerInterface {
 
     //uma entidade por padrão sempre tem que se autovalidar -> não deve deixar para outra parte do sistema
     validate(): void {
-        if (this._name.length === 0) {
-            this.notification.addError({
-                message: "Name is required",
-                context: "customer",
-            });
-        }
+        // if (this._name.length === 0) {
+        //     this.notification.addError({
+        //         message: "Name is required",
+        //         context: "customer",
+        //     });
+        // }
 
-        if (this.id.length === 0) {
-            this.notification.addError({
-                message: "Id is required",
-                context: "customer",
-            });
-        }
+        // if (this.id.length === 0) {
+        //     this.notification.addError({
+        //         message: "Id is required",
+        //         context: "customer",
+        //     });
+        // }
+
+
+        //Validar atributo a atributo acaba sendo trabalhoso
+        //Utilização de bibliotecas de validação de dados
+        //com o mínimo de acoplamento
+        CustomerValidatorFactory.create().validate(this);
     }
 
     get name(): string {
